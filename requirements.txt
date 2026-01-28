@@ -6,5 +6,4 @@ ipykernel
 spacy
 rapidfuzz
 thefuzz
-pandas
-pyarrow
+fastexcel
