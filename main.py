@@ -14,5 +14,7 @@ pyinstaller --onefile --add-data "pkg/.env;." main.py
 """
 
 from pkg.modules import *
+from datetime import datetime
 
-print("Hola")
+date = datetime.now().strftime("%d/%m/%Y %H:%M")
+print(f"Hola {date}")
