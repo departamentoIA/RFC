@@ -17,30 +17,35 @@ def encode_df(file_path: str) -> pl.DataFrame:
     df = df.drop_nulls()
     rows_ini = df.height
 
-    # Change column types
+    # Change column types and create columns
     df = df.with_columns(
-        pl.col([column_names[0], column_names[1]]).cast(
-            pl.String, strict=False)
-    )
-
-    # Create columns
-    df = df.with_columns([
+        pl.col(column_names[0]).cast(pl.String, strict=False),
+        pl.col(column_names[1]).cast(pl.String, strict=False),
         pl.col("RFC").alias("RFC_LIMP"),
         pl.col("RAZON").alias("LIMPIO")
-    ])
+    )
 
+    # To uppercase
+    rfc_expr = pl.col("RFC_LIMP").str.to_uppercase()
+    limpio_expr = pl.col("LIMPIO").str.to_uppercase()
+
+    # To uppercase and replace
     for roto, real in mapeo.items():
-        df = df.with_columns([
-            pl.col("RFC_LIMP").str.replace_all(roto, real),
-            pl.col("LIMPIO").str.replace_all(roto, real)
-        ])
+        rfc_expr = rfc_expr.str.replace_all(roto, real)
+        limpio_expr = limpio_expr.str.replace_all(roto, real)
 
+    df = df.with_columns([
+        rfc_expr,
+        limpio_expr
+    ])
+    """
     # Filter according to allowed pattern
     df_final = df.filter(
         pl.col("LIMPIO").str.contains(patron_no_permitido).not_() &
         pl.col("RFC_LIMP").str.contains(patron_no_permitido).not_()
     )
-
+    """
+    df_final = df
     rows_fin = df_final.height
     print(
         f"Filas eliminadas en decodificación: {rows_ini - rows_fin}, de un total de {rows_ini}")
