@@ -14,7 +14,7 @@ pyinstaller --onefile --add-data "pkg/.env;." main.py
 """
 
 from pkg.modules import *
-from datetime import datetime
 
-date = datetime.now().strftime("%d/%m/%Y %H:%M")
-print(f"Hola {date}")
+df = validate_RFC_and_set_year(file_path)
+
+df.write_excel(f"{csv_file}_limpio.xlsx")
