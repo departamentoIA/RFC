@@ -1,14 +1,14 @@
 # globals.py
 import re
 
-csv_file = 'SAT_CFDIS_2020_Emisor'
+csv_file = 'SAT_DGATIC_2022_Emisor'
 catalogoRFC = 'CatalogoRFC'
-year = 2020
+year = 2022
 
 file_path = './data/' + csv_file + '.csv'
 catalogo_path = './data/' + catalogoRFC + '.xlsx'
 column_names = ['RFC', 'RAZON', 'AÑO']
-patron_no_permitido = r'[\\]'
+allowed_pattern = r'^[A-Z0-9ÑÁÉÍÓÚÜ&\s\".,;\'\\\+]+$'    # Notice negation ^
 
 mapeo = {
     r'ACU\#A': 'ACUÑA', r'ACU\?A': 'ACUÑA', r'CU\?A': 'CUAÑA',
@@ -38,9 +38,9 @@ mapeo = {
     r'M\?LTIPLE': 'MÚLTIPLE', r'SAÃ\?UDO': 'SAÑUDO', r'TUR\?STIC': 'TURÍSTIC',
     r'MÃ\?XICO': 'MÉXICO', r'C\?SAR': 'CÉSAR', r'R\?OS': 'RÍOS',
     r'QUER\?TA': 'QUERÉTA',
-    'Ã‘': 'Ñ', 'Ã±': 'ñ', 'Ã¡': 'á', 'Á ': 'á', 'Ã©': 'é', 'Ã‰': 'É',
-    'Ã­': 'í', 'Ã\xad': 'í', 'Ã³': 'ó', 'Ã“': 'Ó', 'Ãº': 'ú', 'Ãš': 'Ú',
-    'Ã¼': 'ü', 'Ãœ': 'Ü', 'Â¿': '¿', 'Â¡': '¡', 'Ã': 'Á', 'ÃA': 'ÍA',
+    'Ã‘': 'Ñ', 'Ã±': 'Ñ', 'Ã¡': 'Á', 'Ã©': 'É', 'Ã‰': 'É',
+    'Ã­': 'Í', 'Ã\xad': 'Í', 'Ã³': 'Ó', 'Ã“': 'Ó', 'Ãº': 'Ú', 'Ãš': 'Ú',
+    'Ã¼': 'Ü', 'Ãœ': 'Ü', 'Â¿': '¿', 'Â¡': '¡', 'Ã': 'Á', 'ÃA': 'ÍA',
     'UÃ': 'UÍ',
 }
 

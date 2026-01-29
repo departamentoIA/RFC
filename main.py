@@ -18,5 +18,4 @@ from pkg.modules import *
 df_decodificado = encode_df(file_path)
 
 # df = validate_RFC_and_set_year(df_decodificado)
-
 # df.write_excel(f"{csv_file}_limpio.xlsx")
