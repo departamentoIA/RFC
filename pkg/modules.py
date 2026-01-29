@@ -16,11 +16,13 @@ def encode_df(file_path: str) -> pl.DataFrame:
 
     df = df.drop_nulls()
     rows_ini = df.height
+
     # Change column types
     df = df.with_columns(
         pl.col([column_names[0], column_names[1]]).cast(
             pl.String, strict=False)
     )
+
     # Create columns
     df = df.with_columns([
         pl.col("RFC").alias("RFC_LIMP"),
@@ -42,7 +44,7 @@ def encode_df(file_path: str) -> pl.DataFrame:
     rows_fin = df_final.height
     print(
         f"Filas eliminadas en decodificación: {rows_ini - rows_fin}, de un total de {rows_ini}")
-    # df_final.write_excel(f"{csv_file}_decodificado.xlsx")
+    df_final.write_excel(f"{csv_file}_decodificado.xlsx")
 
     # Extract specific columns
     df = df_final.select(['RFC_LIMP', 'LIMPIO'])
@@ -50,11 +52,10 @@ def encode_df(file_path: str) -> pl.DataFrame:
     return df
 
 
-def validate_RFC_and_set_year(file_path: str) -> pl.DataFrame:
-    """Normalize RFC and delete invalid RFC.
-    Besides, column 'PERSONA' is added, corresponding to 'FISICA' or 'MORAL',
+def validate_RFC_and_set_year(df: pl.DataFrame) -> pl.DataFrame:
+    """Receive an encoded DataFrame, normalize RFC and delete invalid RFC.
+    Then, column 'PERSONA' is added, corresponding to 'FISICA' or 'MORAL',
     and column 'AÑO' is also added."""
-    df = encode_df(file_path)
     # Normalize RFC
     df = df.with_columns(
         pl.col("RFC").str.strip_chars().str.strip_chars('.')
