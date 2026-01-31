@@ -15,7 +15,9 @@ pyinstaller --onefile --add-data "pkg/.env;." main.py
 
 from pkg.modules import *
 
-df_decodificado = encode_df(file_path)
 
-# df = validate_RFC_and_set_year(df_decodificado)
-# df.write_excel(f"{csv_file}_limpio.xlsx")
+df_decodificado = encode_df(file_path)
+df = validate_RFC_and_set_year(df_decodificado)
+# try_write_excel(df, csv_file, "validado")
+df_moral = split_df_save_df_fisica(df)
+try_write_excel(df_moral, csv_file, "moral")

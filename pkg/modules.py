@@ -1,8 +1,16 @@
 # modules.py
 import polars as pl
-import spacy                # Recommended for Spanish
+import spacy                    # Recommended for Spanish
 from rapidfuzz import fuzz
 from pkg.globals import *
+
+
+def try_write_excel(df: pl.DataFrame, file: str, status: str) -> None:
+    """Try to write in Excel file."""
+    try:
+        df.write_excel(f"{file}_{status}.xlsx")
+    except:
+        print("\n\nNo puedo escribir en el excel si está abierto!")
 
 
 def encode_df(file_path: str) -> pl.DataFrame:
@@ -39,9 +47,8 @@ def encode_df(file_path: str) -> pl.DataFrame:
         .str.replace_all(r"\s+", " ")
         .str.strip_chars()
     )
-
     limpio_expr = (
-        limpio_expr.str.replace_all(r'[?\\"]', " ")
+        limpio_expr.str.replace_all(r'[?\\"*]', " ")
         .str.replace_all(r"\s+", " ")
         .str.strip_chars()
     )
@@ -54,13 +61,13 @@ def encode_df(file_path: str) -> pl.DataFrame:
 
     # Filter according to allowed pattern
     df_final = df_final.filter(
-        pl.col("LIMPIO").str.contains(allowed_pattern)
+        (pl.col("LIMPIO").str.contains(allowed_pattern))
     )
 
     rows_fin = df_final.height
     print(
         f"Filas eliminadas en decodificación: {rows_ini - rows_fin}, de un total de {rows_ini}")
-    df_final.write_excel(f"{csv_file}_decodificado.xlsx")
+    try_write_excel(df_final, csv_file, "decodificado")
 
     # Extract specific columns
     df = df_final.select(['RFC_LIMP', 'LIMPIO'])
@@ -94,8 +101,15 @@ def validate_RFC_and_set_year(df: pl.DataFrame) -> pl.DataFrame:
 
     # Add year
     df = df.with_columns(pl.lit(year).alias(column_names[2]))
-    # df.write_excel(f"{csv_file}_limpio.xlsx")
     return df
+
+
+def split_df_save_df_fisica(df: pl.DataFrame) -> pl.DataFrame:
+    """Receive the full df, divide it into 'moral' and 'fisica',
+    df_fisica is saved as df_fisica.parquet and df_moral is returned."""
+    df_fisica = df.filter(pl.col("PERSONA") == "FISICA")
+    df_fisica.write_parquet("df_fisica.parquet")
+    return df.filter(pl.col("PERSONA") == "MORAL")
 
 
 '''

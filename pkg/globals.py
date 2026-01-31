@@ -8,9 +8,18 @@ year = 2022
 file_path = './data/' + csv_file + '.csv'
 catalogo_path = './data/' + catalogoRFC + '.xlsx'
 column_names = ['RFC', 'RAZON', 'AÑO']
-allowed_pattern = r'^[A-Z0-9ÑÁÉÍÓÚÜ&\s\".,;\'\\\+]+$'    # Notice negation ^
+# Notice negation ^
+allowed_pattern = r'^[A-Z0-9ÑÁÉÍÓÚÜ&\s\".,;\'\\\+\-´\(\)\/:_]+$'
 
 mapeo = {
+    'Ã‘': 'Ñ', 'Ã±': 'Ñ', 'ÃƑ': 'Ñ',
+    'Ã¡': 'Á', 'Ã ': 'Á', 'Ã': 'Á', 'Ã€': 'Á',
+    'Ã©': 'É', 'Ã‰': 'É', 'Ã¨': 'É',
+    'Ã­': 'Í', 'Ã': 'Í', 'Ã\xad': 'Í', 'Ã¬': 'Í',
+    'Ã³': 'Ó', 'Ã“': 'Ó', 'Ã’': 'Ó', 'Ã²': 'Ó',
+    'Ãº': 'Ú', 'ÃŠ': 'Ú',
+    'Ã¼': 'Ü', 'Ãœ': 'Ü', 'ÃŒ': 'Ü', 'Ã›': 'Ü',
+    'ÃA': 'ÍA', 'UÃ': 'UÍ', 'Â´': '´', '`': '´',
     r'ACU\#A': 'ACUÑA', r'ACU\?A': 'ACUÑA', r'CU\?A': 'CUAÑA',
     r'ACUÃ\?A': 'ACUÑA', r'BOLA\?OS': 'BOLAÑOS', r'A\?UELO': 'AÑUELO',
     r'AVENDA\?O': 'AVENDAÑO',  r'NIER\?A': 'NIERÍA',
@@ -37,11 +46,9 @@ mapeo = {
     r'ENSEÃ\?ANZA': 'ENSEÑANZA', r'ESPAÃ\?': 'ESPAÑ', r'ESPA\?A': 'ESPAÑA',
     r'M\?LTIPLE': 'MÚLTIPLE', r'SAÃ\?UDO': 'SAÑUDO', r'TUR\?STIC': 'TURÍSTIC',
     r'MÃ\?XICO': 'MÉXICO', r'C\?SAR': 'CÉSAR', r'R\?OS': 'RÍOS',
-    r'QUER\?TA': 'QUERÉTA',
-    'Ã‘': 'Ñ', 'Ã±': 'Ñ', 'Ã¡': 'Á', 'Ã©': 'É', 'Ã‰': 'É',
-    'Ã­': 'Í', 'Ã\xad': 'Í', 'Ã³': 'Ó', 'Ã“': 'Ó', 'Ãº': 'Ú', 'Ãš': 'Ú',
-    'Ã¼': 'Ü', 'Ãœ': 'Ü', 'Â¿': '¿', 'Â¡': '¡', 'Ã': 'Á', 'ÃA': 'ÍA',
-    'UÃ': 'UÍ',
+    r'QUER\?TA': 'QUERÉTA', 'MÃˆXI': 'MÉXI', 'MARÃŒA': 'MARÍA', 'GALVÃ N': 'GALVÁN',
+    r'B\?RCENAS': 'BÁRCENAS', r'ANG\?LICA': 'ANGÉLICA', r'ROC\?O': 'ROCÍO',
+    r'GARC\?A': 'GARCÍA', r'ANDR\?S': 'ANDRÉS',
 }
 
 # Regular expressions
