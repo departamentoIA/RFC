@@ -1,12 +1,14 @@
 # globals.py
 import re
 
-csv_file = 'SAT_DGATIC_2022_Emisor'
-catalogoRFC = 'CatalogoRFC'
+csv_file = 'prueba'
+CATALOGO_RFC = 'CatalogoRFC'
+PROVEEDORES_RIESGO_TIC = 'PROVEEDOR_RIESGO_TIC'
 year = 2022
 
 file_path = './data/' + csv_file + '.csv'
-catalogo_path = './data/' + catalogoRFC + '.xlsx'
+catalogo_path = './data/' + CATALOGO_RFC + '.xlsx'
+proveedoresRiesgoTIC_path = './data/' + PROVEEDORES_RIESGO_TIC + '.xlsx'
 column_names = ['RFC', 'RAZON', 'AÑO']
 # Notice negation ^
 allowed_pattern = r'^[A-Z0-9ÑÁÉÍÓÚÜ&\s\".,;\'\\\+\-´\(\)\/:_]+$'
@@ -65,3 +67,14 @@ RFC_MORAL_REGEX = re.compile(
     r"(0[1-9]|[12]\d|3[01])"
     r"[A-Z0-9]{3}$"
 )
+
+# Patterns like S.A., C.V.
+norm_rules = [
+    (r'\bS\.?\s?A\.? ', "SA "),
+    (r'\bS\.?\s?A\.?\b', "SA"),
+    (r'\bC\.?\s?V\.?\b', "CV"),
+    (r'\bS\.?\s?C\.?\b', "SC"),
+    (r'\bS\.?\s?A\.?P\.?\s?I\.?\s?\b', "SAPI "),
+    (r'\bA\.?\s?C\.? ', "AC "),
+    (r'\bA\.?\s?C\.?\b', "AC"),
+]

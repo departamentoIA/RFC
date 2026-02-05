@@ -18,6 +18,9 @@ from pkg.modules import *
 
 df_decodificado = encode_df(file_path)
 df = validate_RFC_and_set_year(df_decodificado)
-# try_write_excel(df, csv_file, "validado")
-df_moral = split_df_save_df_fisica(df)
+try_write_excel(df, csv_file, "validado")
+df_moral_completo = get_df_moral_and_save_df_fisica(df)
+try_write_excel(df_moral_completo, csv_file, "moral_completo")
+df_moral = process_df_moral(
+    df_moral_completo, file_path, catalogo_path, proveedoresRiesgoTIC_path)
 try_write_excel(df_moral, csv_file, "moral")

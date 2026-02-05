@@ -5,7 +5,7 @@ from rapidfuzz import fuzz
 from pkg.globals import *
 
 
-def try_write_excel(df: pl.DataFrame, file: str, status: str) -> None:
+def try_write_excel(df: pl.DataFrame, file: str, status="") -> None:
     """Try to write in Excel file."""
     try:
         df.write_excel(f"{file}_{status}.xlsx")
@@ -23,7 +23,7 @@ def encode_df(file_path: str) -> pl.DataFrame:
     )
     df = df.drop_nulls()
     rows_ini = df.height
-
+    print(f"Decodificando {file_path}...")
     # Change column types and create columns
     df = df.with_columns(
         pl.col(column_names[0]).cast(pl.String, strict=False),
@@ -104,26 +104,52 @@ def validate_RFC_and_set_year(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-def split_df_save_df_fisica(df: pl.DataFrame) -> pl.DataFrame:
-    """Receive the full df, divide it into 'moral' and 'fisica',
-    df_fisica is saved as df_fisica.parquet and df_moral is returned."""
+def normalize_tax_regime(df: pl.DataFrame) -> pl.DataFrame:
+    """Receive df_moral and normalize tax regime of RFC.
+    Column 'NOMBRE' is added."""
+    # Normalize "RAZON"
+    normalize_text = (
+        pl.col(column_names[1])
+        .cast(pl.String)
+        .str.strip_chars(".,; ")
+        .str.replace_all(r"[,;.]", "")
+        .str.to_uppercase()
+    )
+
+    for pattern, replacement in norm_rules:
+        normalize_text = normalize_text.str.replace_all(pattern, replacement)
+
+    normalize_text = (
+        normalize_text.str.replace_all(r'[/\-]', ' ')
+        .str.replace_all(r'\s+', ' ')
+        .str.strip_chars()
+    )
+    return df.with_columns(normalize_text.alias("NOMBRE"))
+
+
+def get_df_moral_and_save_df_fisica(df: pl.DataFrame) -> pl.DataFrame:
+    """Receive the full df, divide it into 'moral' and 'fisica', df_fisica is saved as
+    df_fisica.parquet. For df_moral, tax regime of RFC is normalized and
+    column 'NOMBRE' is created."""
     df_fisica = df.filter(pl.col("PERSONA") == "FISICA")
     df_fisica.write_parquet("df_fisica.parquet")
-    return df.filter(pl.col("PERSONA") == "MORAL")
+    print("DataFrame 'fisica' se guardó como df_fisica.parquet")
+    df_moral = df.filter(pl.col("PERSONA") == "MORAL")
+    return normalize_tax_regime(df_moral)
 
 
-'''
-def process_df_moral(file_path: str, catalogo_path: str) -> pl.DataFrame:
-    """Construct a DataFrame with columns 'RFC', 'RAZON' and 'AÑO',
-    after manual encoding and RFC substraction"""
-    # df = normalize_RFC(file_path)
-    catalogo = pl.read_excel(catalogo_path)
+def process_df_moral(df: pl.DataFrame, file_path: str, catalogo_path: str, proveedoresRiesgoTIC_path: str) -> pl.DataFrame:
+    """Receive df_moral and delete all RFC of 'CatalogoRFC' and 'ProveedoresRiesgoTIC'.
+    Columns are 'RFC', 'NOMBRE' and 'AÑO'."""
+    df_catalogoRFC = pl.read_excel(catalogo_path)
+    df_proveedores = pl.read_excel(proveedoresRiesgoTIC_path)
 
     rows_ini = df.height
     print(f"Filas iniciales = {rows_ini}")
 
     # Delete RFC of df if they are in catalogo
-    df = df.join(catalogo, on="RFC", how="anti")
+    df = df.join(df_catalogoRFC, on="RFC", how="anti")
+    df = df.join(df_proveedores, on="RFC", how="anti")
     # df.write_excel(f"{csv_file}_filtrado.xlsx")
 
     rows_fin = df.height
@@ -132,4 +158,3 @@ def process_df_moral(file_path: str, catalogo_path: str) -> pl.DataFrame:
 
     # print(df.head())
     return df
-'''
