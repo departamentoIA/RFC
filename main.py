@@ -8,19 +8,23 @@ Version:        1.0
 Description:    This script obtains all valid RFC and the corresponding name.
 Dependencies:   polars==1.37.1, openpyxl==3.1.5, xlsxwriter==3.2.9, spacy==3.8.11,
                 RapidFuzz==3.14.3, thefuzz==0.22.1
-Usage:          'CatalogoRFC' and 'rfc' are requested to run this script.
+Usage:          'CatalogoRFC', 'PROVEEDORES_RIESGO_TIC', 'RFC_MORAL', 'RFC_FISICA' and
+                the file with new RFC are requested to run this script.
 Portability:    To make this project executable, run:
 pyinstaller --onefile --add-data "pkg/.env;." main.py
 """
 
 from pkg.modules import *
+from pkg.moral_functions import *
 
 
 df_decodificado = encode_df(file_path)
 df = validate_RFC_and_set_year(df_decodificado)
-try_write_excel(df, csv_file, "validado")
+# try_write_excel(df, csv_file, "validado")
 df_moral_completo = get_df_moral_and_save_df_fisica(df)
-try_write_excel(df_moral_completo, csv_file, "moral_completo")
+# try_write_excel(df_moral_completo, csv_file, "moral_completo")
 df_moral = process_df_moral(
     df_moral_completo, file_path, catalogo_path, proveedoresRiesgoTIC_path)
-try_write_excel(df_moral, csv_file, "moral")
+# try_write_excel(df_moral, csv_file, "moral_procesado")
+df_moral_concatenado = concat_dfs(df_moral, catalogo_moral_path)
+try_write_excel(df_moral_concatenado, csv_file, "moral_concatenado")

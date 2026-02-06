@@ -3,12 +3,17 @@ import re
 
 csv_file = 'prueba'
 CATALOGO_RFC = 'CatalogoRFC'
-PROVEEDORES_RIESGO_TIC = 'PROVEEDOR_RIESGO_TIC'
+PROVEEDORES_RIESGO_TIC = 'PROVEEDORES_RIESGO_TIC'
+RFC_MORAL = 'RFC_MORAL'
+RFC_FISICA = 'RFC_FISICA'
 year = 2022
 
 file_path = './data/' + csv_file + '.csv'
 catalogo_path = './data/' + CATALOGO_RFC + '.xlsx'
 proveedoresRiesgoTIC_path = './data/' + PROVEEDORES_RIESGO_TIC + '.xlsx'
+catalogo_moral_path = './data/' + RFC_MORAL + '.xlsx'
+catalogo_fisica_path = './data/' + RFC_FISICA + '.xlsx'
+
 column_names = ['RFC', 'RAZON', 'AÑO']
 # Notice negation ^
 allowed_pattern = r'^[A-Z0-9ÑÁÉÍÓÚÜ&\s\".,;\'\\\+\-´\(\)\/:_]+$'
