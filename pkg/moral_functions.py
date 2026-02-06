@@ -64,6 +64,31 @@ def process_df_moral(df: pl.DataFrame, file_path: str,
     return df
 
 
+def lemmatization(df: pl.DataFrame) -> pl.DataFrame:
+    """Receive df_moral and obtain the lemma column."""
+    # Load the model
+    nlp = spacy.load("es_core_news_sm", disable=["ner", "parser"])
+
+    # Obtain unique names in column "NOMBRE"
+    unique_nombres = df.select("NOMBRE").unique()
+
+    def lemmatize_pipe(s: pl.Series) -> pl.Series:
+        # Batch processing only on the unique
+        return pl.Series([
+            " ".join([t.lemma_ for t in doc]).upper()
+            for doc in nlp.pipe(s.str.to_lowercase(), batch_size=500)
+        ])
+
+    # Create a lemmatization "map" (small DataFrame)
+    lemmas_map = unique_nombres.with_columns(
+        pl.col("NOMBRE").map_batches(lemmatize_pipe).alias("LEMA")
+    )
+
+    # Join the map to the original DataFrame
+    # to instantly assign the correct lemma to each original row
+    return df.join(lemmas_map, on="NOMBRE", how="left")
+
+
 def concat_dfs(df: pl.DataFrame, file_path: str) -> pl.DataFrame:
     """Receive df and concat with the corresponding DataFrame of 'file_path'.
     Both DataFrames should have the same columns. The concated df is sorted
